@@ -19,6 +19,8 @@ describe('InstancesService', () => {
   });
 
   afterEach(() => {
+    db.run('DELETE FROM backups');
+    db.run('DELETE FROM instances');
     db.onModuleDestroy();
   });
 
@@ -48,7 +50,9 @@ describe('InstancesService', () => {
     const preview = service.getComposePreview(instance.id);
     expect(preview.yaml).toContain('image: mysql:8.4');
     expect(preview.yaml).toContain('MYSQL_ROOT_PASSWORD: password');
-    expect(preview.yaml).toContain('/opt/dbstack/mysql/mysql_001:/var/lib/mysql');
+    expect(preview.yaml).toContain(
+      '/opt/dbstack/mysql/mysql_001:/var/lib/mysql',
+    );
   });
 
   it('updates status and records backup action', () => {
@@ -78,7 +82,10 @@ describe('InstancesService', () => {
     const updated = service.findById(instance.id);
     expect(updated.status).toBe('running');
 
-    const backups = db.query<{ id: string }>('SELECT id FROM backups WHERE instanceId = ?', [instance.id]);
+    const backups = db.query<{ id: string }>(
+      'SELECT id FROM backups WHERE instanceId = ?',
+      [instance.id],
+    );
     expect(backups).toHaveLength(1);
   });
 });

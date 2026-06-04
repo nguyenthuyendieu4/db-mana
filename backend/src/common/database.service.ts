@@ -1,11 +1,11 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import Database from 'better-sqlite3';
+import BetterSqlite3, { Database as SqliteDatabase } from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 @Injectable()
 export class DatabaseService implements OnModuleDestroy {
-  private readonly db: Database.Database;
+  private readonly db: SqliteDatabase;
 
   constructor() {
     const dbPath = join(process.cwd(), 'data', 'dbstack.sqlite');
@@ -15,7 +15,7 @@ export class DatabaseService implements OnModuleDestroy {
       mkdirSync(dbDir, { recursive: true });
     }
 
-    this.db = new Database(dbPath);
+    this.db = new BetterSqlite3(dbPath);
     this.db.pragma('journal_mode = WAL');
     this.migrate();
     this.seedUsers();
@@ -81,30 +81,26 @@ export class DatabaseService implements OnModuleDestroy {
   }
 
   private seedUsers(): void {
-    const totalUsers = this.get<{ total: number }>('SELECT COUNT(*) as total FROM users')?.total ?? 0;
+    const totalUsers =
+      this.get<{ total: number }>('SELECT COUNT(*) as total FROM users')
+        ?.total ?? 0;
 
     if (totalUsers > 0) {
       return;
     }
 
     const now = new Date().toISOString();
-    this.run('INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)', [
-      'user-super-admin',
-      'super-admin',
-      'super-admin',
-      now,
-    ]);
-    this.run('INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)', [
-      'user-operator',
-      'operator',
-      'operator',
-      now,
-    ]);
-    this.run('INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)', [
-      'user-read-only',
-      'read-only',
-      'read-only',
-      now,
-    ]);
+    this.run(
+      'INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)',
+      ['user-super-admin', 'super-admin', 'super-admin', now],
+    );
+    this.run(
+      'INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)',
+      ['user-operator', 'operator', 'operator', now],
+    );
+    this.run(
+      'INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)',
+      ['user-read-only', 'read-only', 'read-only', now],
+    );
   }
 }

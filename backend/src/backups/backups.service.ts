@@ -15,7 +15,9 @@ export class BackupsService {
       );
     }
 
-    return this.db.query<Backup>('SELECT * FROM backups ORDER BY createdAt DESC');
+    return this.db.query<Backup>(
+      'SELECT * FROM backups ORDER BY createdAt DESC',
+    );
   }
 
   create(
@@ -33,7 +35,13 @@ export class BackupsService {
 
     this.db.run(
       'INSERT INTO backups (id, instanceId, type, source, createdAt) VALUES (?, ?, ?, ?, ?)',
-      [backup.id, backup.instanceId, backup.type, backup.source, backup.createdAt],
+      [
+        backup.id,
+        backup.instanceId,
+        backup.type,
+        backup.source,
+        backup.createdAt,
+      ],
     );
 
     return backup;

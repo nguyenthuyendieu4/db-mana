@@ -5,8 +5,18 @@ export class TemplatesController {
   @Get()
   list() {
     return [
-      { id: 'mysql-prod', name: 'MySQL Production', engine: 'mysql', profile: 'production' },
-      { id: 'mysql-dev', name: 'MySQL Development', engine: 'mysql', profile: 'development' },
+      {
+        id: 'mysql-prod',
+        name: 'MySQL Production',
+        engine: 'mysql',
+        profile: 'production',
+      },
+      {
+        id: 'mysql-dev',
+        name: 'MySQL Development',
+        engine: 'mysql',
+        profile: 'development',
+      },
       {
         id: 'mariadb-ecommerce',
         name: 'MariaDB Ecommerce',

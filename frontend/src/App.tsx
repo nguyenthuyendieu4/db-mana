@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 
 type Engine = 'mysql' | 'mariadb' | 'postgresql';
 type Role = 'super-admin' | 'operator' | 'read-only';
@@ -130,12 +131,6 @@ function App() {
     void loadAll();
   }, []);
 
-  useEffect(() => {
-    const defaultVersion = versions[0];
-    if (!versions.includes(form.version)) {
-      setForm((prev) => ({ ...prev, version: defaultVersion }));
-    }
-  }, [versions, form.version]);
 
   async function loadAll() {
     try {
@@ -278,14 +273,22 @@ function App() {
                         { label: 'MariaDB', value: 'mariadb' },
                         { label: 'PostgreSQL', value: 'postgresql' },
                       ]}
-                      onChange={(value) =>
+                      onChange={(value) => {
+                        const nextEngine = value as Engine;
+                        const nextVersion =
+                          nextEngine === 'mysql'
+                            ? '5.7'
+                            : nextEngine === 'mariadb'
+                              ? '10.6'
+                              : '14';
                         setForm((prev) => ({
                           ...prev,
-                          engine: value as Engine,
-                          containerPort: value === 'postgresql' ? 5432 : 3306,
-                          hostPort: value === 'postgresql' ? 5432 : 3306,
-                        }))
-                      }
+                          engine: nextEngine,
+                          version: nextVersion,
+                          containerPort: nextEngine === 'postgresql' ? 5432 : 3306,
+                          hostPort: nextEngine === 'postgresql' ? 5432 : 3306,
+                        }));
+                      }}
                     />
                   )}
 

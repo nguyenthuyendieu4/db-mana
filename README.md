@@ -266,3 +266,38 @@ Kiến trúc plugin-based để bổ sung engine mới:
 
 - MongoDB
 - Redis
+
+## Khởi chạy dự án (MVP hiện tại)
+
+### 1) Backend (NestJS + SQLite)
+
+```bash
+cd /tmp/workspace/nguyenthuyendieu4/db-mana/backend
+npm install
+npm run start:dev
+```
+
+Backend chạy mặc định tại `http://localhost:3000`.
+
+### 2) Frontend (React + TypeScript + TailwindCSS)
+
+```bash
+cd /tmp/workspace/nguyenthuyendieu4/db-mana/frontend
+npm install
+npm run dev
+```
+
+Frontend chạy mặc định tại `http://localhost:5173`.
+
+### API chính đã có trong MVP
+
+- `GET /api/health`
+- `GET /api/instances`
+- `POST /api/instances`
+- `POST /api/instances/:id/actions`
+- `GET /api/instances/:id/compose`
+- `DELETE /api/instances/:id`
+- `GET /api/backups`
+- `GET /api/monitoring/overview`
+- `GET /api/templates`
+- `GET /api/users`

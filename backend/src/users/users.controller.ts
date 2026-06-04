@@ -27,12 +27,10 @@ export class UsersController {
       createdAt: new Date().toISOString(),
     };
 
-    this.db.run('INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)', [
-      user.id,
-      user.username,
-      user.role,
-      user.createdAt,
-    ]);
+    this.db.run(
+      'INSERT INTO users (id, username, role, createdAt) VALUES (?, ?, ?, ?)',
+      [user.id, user.username, user.role, user.createdAt],
+    );
 
     return user;
   }

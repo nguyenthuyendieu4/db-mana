@@ -40,3 +40,10 @@ export interface InstanceActionDto {
   action: InstanceAction;
   version?: string;
 }
+
+export interface ComposePreview {
+  serviceName: string;
+  engine: DatabaseEngine;
+  version: string;
+  yaml: string;
+}

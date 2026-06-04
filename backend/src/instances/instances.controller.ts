@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { InstancesService } from './instances.service';
-import { CreateInstanceDto, InstanceActionDto } from './instances.types';
+import type { CreateInstanceDto, InstanceActionDto } from './instances.types';
 
 @Controller('api/instances')
 export class InstancesController {

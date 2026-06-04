@@ -1,21 +1,19 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { DatabaseService } from '../common/database.service';
 import { BackupsService } from '../backups/backups.service';
 import {
+  ComposePreview,
   CreateInstanceDto,
   DatabaseEngine,
   Instance,
   InstanceActionDto,
   InstanceStatus,
 } from './instances.types';
-
-interface ComposePreview {
-  serviceName: string;
-  engine: DatabaseEngine;
-  version: string;
-  yaml: string;
-}
 
 @Injectable()
 export class InstancesService {
@@ -25,11 +23,16 @@ export class InstancesService {
   ) {}
 
   list(): Instance[] {
-    return this.db.query<Instance>('SELECT * FROM instances ORDER BY createdAt DESC');
+    return this.db.query<Instance>(
+      'SELECT * FROM instances ORDER BY createdAt DESC',
+    );
   }
 
   create(dto: CreateInstanceDto): Instance {
-    const exists = this.db.get<{ id: string }>('SELECT id FROM instances WHERE name = ?', [dto.name]);
+    const exists = this.db.get<{ id: string }>(
+      'SELECT id FROM instances WHERE name = ?',
+      [dto.name],
+    );
     if (exists) {
       throw new BadRequestException('Instance name already exists');
     }
@@ -102,9 +105,14 @@ export class InstancesService {
         break;
       case 'upgrade':
         if (!dto.version) {
-          throw new BadRequestException('Version is required for upgrade action');
+          throw new BadRequestException(
+            'Version is required for upgrade action',
+          );
         }
-        this.db.run('UPDATE instances SET version = ? WHERE id = ?', [dto.version, instance.id]);
+        this.db.run('UPDATE instances SET version = ? WHERE id = ?', [
+          dto.version,
+          instance.id,
+        ]);
         this.updateStatus(instance.id, 'warning');
         break;
       default:
@@ -116,7 +124,8 @@ export class InstancesService {
 
   getComposePreview(id: string): ComposePreview {
     const instance = this.findById(id);
-    const imageName = instance.engine === 'postgresql' ? 'postgres' : instance.engine;
+    const imageName =
+      instance.engine === 'postgresql' ? 'postgres' : instance.engine;
     const serviceName = instance.name;
     const dataPath = `/opt/dbstack/${instance.engine}/${instance.name}`;
 
@@ -128,7 +137,7 @@ export class InstancesService {
       environment = `      POSTGRES_USER: ${instance.rootUser}\n      POSTGRES_PASSWORD: ${instance.password}\n      POSTGRES_DB: ${instance.databaseName}\n`;
     }
 
-    const yaml = `services:\n  ${serviceName}:\n    image: ${imageName}:${instance.version}\n    container_name: ${serviceName}\n    restart: always\n\n    environment:\n${environment}    ports:\n      - \"${instance.hostPort}:${instance.containerPort}\"\n\n    volumes:\n      - ${dataPath}:${this.getContainerDataPath(instance.engine)}\n\n    networks:\n      - ${serviceName}_net\n\nnetworks:\n  ${serviceName}_net:\n    driver: bridge\n`;
+    const yaml = `services:\n  ${serviceName}:\n    image: ${imageName}:${instance.version}\n    container_name: ${serviceName}\n    restart: always\n\n    environment:\n${environment}    ports:\n      - "${instance.hostPort}:${instance.containerPort}"\n\n    volumes:\n      - ${dataPath}:${this.getContainerDataPath(instance.engine)}\n\n    networks:\n      - ${serviceName}_net\n\nnetworks:\n  ${serviceName}_net:\n    driver: bridge\n`;
 
     return {
       serviceName,
@@ -139,7 +148,10 @@ export class InstancesService {
   }
 
   findById(id: string): Instance {
-    const instance = this.db.get<Instance>('SELECT * FROM instances WHERE id = ?', [id]);
+    const instance = this.db.get<Instance>(
+      'SELECT * FROM instances WHERE id = ?',
+      [id],
+    );
     if (!instance) {
       throw new NotFoundException('Instance not found');
     }
